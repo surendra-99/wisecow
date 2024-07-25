@@ -35,11 +35,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -f -N -L 16443:localhost:16443 ubuntu@65.1.112.89
 
       - name: Add SSH host key
         run: |
           ssh-keyscan -H 65.1.112.89 >> ~/.ssh/known_hosts
+      - name: Create SSH tunnel
+        run: |
+          ssh -o StrictHostKeyChecking=no -f -N -L 16443:localhost:16443 ubuntu@65.1.112.89
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
