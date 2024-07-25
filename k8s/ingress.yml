@@ -5,7 +5,7 @@ metadata:
 #  annotations:
     #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # nginx.ingress.kubernetes.io/secure-backends: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+   # cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
   - hosts:
