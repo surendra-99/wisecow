@@ -49,11 +49,11 @@ jobs:
         
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
-          kubectl apply -f k8s/ingress.yaml
-          kubectl apply -f k8s/cluster-issuer.yaml
-          kubectl apply -f k8s/certificate.yaml
+          kubectl apply -f k8s/deployment.yml
+          kubectl apply -f k8s/service.yml
+          kubectl apply -f k8s/ingress.yml
+          kubectl apply -f k8s/cluster-issuer.yml
+          kubectl apply -f k8s/certificate.yml
 
       - name: Wait for TLS certificate to be issued
         run: |
