@@ -65,7 +65,7 @@ jobs:
           kubectl apply -f k8s/deployment.yml --v=8
           kubectl apply -f k8s/service.yml
           kubectl apply -f k8s/ingress.yml
-          kubectl apply -f k8s/cluster-issuer.yml
+          kubectl apply -f k8s/clusterissuer.yml
           kubectl apply -f k8s/certificate.yml
 
       - name: Wait for TLS certificate to be issued
