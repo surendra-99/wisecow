@@ -35,11 +35,8 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Set up Kubeconfig for MicroK8s
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+      - name: Configure kubectl
+        run: echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
 
       - name: Apply Kubernetes manifests
         run: |
