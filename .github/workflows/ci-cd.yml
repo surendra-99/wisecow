@@ -35,12 +35,18 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Set up Kubeconfig for MicroK8s
+      - name: Set up Kubeconfig
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config || { echo 'Error decoding base64 input'; exit 1; }
-          chmod 600 $HOME/.kube/config
-
+         mkdir -p $HOME/.kube
+         echo "Directory created at $HOME/.kube"
+         echo "Base64 data received:"
+         echo "${{ secrets.KUBE_CONFIG_DATA }}" | head -n 10
+         echo "Decoding base64 data..."
+         echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+         echo "Kubeconfig written to $HOME/.kube/config"
+         chmod 600 $HOME/.kube/config
+         ls -la $HOME/.kube
+        
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/deployment.yaml
