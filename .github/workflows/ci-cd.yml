@@ -1,27 +1,20 @@
-name: Build and Push Docker Image
+name: Build, Deploy, and Secure Application
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
     steps:
-      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Step 3: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -29,13 +22,40 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 4: Build and push Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: | 
-            ghcr.io/${{ github.repository_owner }}/wisecow:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/wisecow:${{ github.sha }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/cluster-issuer.yaml
+          kubectl apply -f k8s/certificate.yaml
+
+      - name: Wait for TLS certificate to be issued
+        run: |
+          echo "Waiting for TLS certificate to be issued..."
+          while true; do
+            STATUS=$(kubectl get certificate wisecow-tls -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+            if [ "$STATUS" == "True" ]; then
+              echo "TLS certificate issued successfully."
+              break
+            fi
+            echo "TLS certificate not yet issued. Checking again in 30 seconds..."
+            sleep 30
+          done
 
